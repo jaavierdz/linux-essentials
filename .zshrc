@@ -92,14 +92,17 @@ wdstack() {
         echo "Docker"
         cat Dockerfile
     elif [ -f "Makefile" ]; then
-        echo "Makefile detected"
+        echo "Makefiles"
         cat Makefile
     elif [ -f "CMakeLists.txt" ]; then
-        echo "CMake detected"
+        echo "CMake"
         cat CMakeLists.txt
     elif [ -f "setup.py" ]; then
         echo "Python (setup.py)"
         cat setup.py
+    elif ls *.sh 1> /dev/null 2>&1; then
+        echo "Shell Script"
+        ls *.sh
     else
         echo "No se pudo detectar el stack tecnológico del directorio actual"
     fi
