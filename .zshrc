@@ -34,8 +34,14 @@ alias reload="source ~/.zshrc"
 
 # funciones
 mkcd() {
-  mkdir -p "$1"
-  cd "$1" || return
+    if [ -z "$1" ]; then
+        echo "No arguments."
+        return 1
+    else
+        mkdir -p "$1"
+        cd "$1" || return
+    fi
+
 }
 # Para extraer varios tipos de archivos comprimidos ez
 extract() {
