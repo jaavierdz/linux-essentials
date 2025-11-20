@@ -8,12 +8,12 @@
 
 
 
-ZSH_THEME="agnoster"
+# ZSH_THEME="agnoster"
 
 
-plugins=(git)
+# plugins=(git)
 
-source ~/.oh-my-zsh/oh-my-zsh.sh
+# source ~/.oh-my-zsh/oh-my-zsh.sh
 
 
 # =================[ CONFIG JAVIER ]==================
@@ -169,34 +169,33 @@ update_zshrc() {
     echo ".zshrc actualizado desde el repositorio."
 }
 
-# PROMPT personalizado (versión mejorada)
+# PROMPT PERSONALIZAZDO
 setopt PROMPT_SUBST
 
-# Muestra la rama y el estado de Git (✓ = limpio, * = cambios)
+PROMPT_EMOJI="⚡"
+
+exit_status() {
+  local es=$?
+  [[ $es -ne 0 ]] && echo "%F{red}✗ $es%f"
+}
+
 git_prompt() {
-    local branch state
-    branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || return
-    if [ -n "$branch" ]; then
-        if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-            state="*"
-        else
-            state="✓"
-        fi
-        echo "%F{magenta}(${branch}${state})%f"
-    fi
+  local branch git_state
+  branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || return
+
+  local icon=""
+
+  if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+    git_state="%F{red}✗%f"
+  else
+    git_state="%F{green}✓%f"
+  fi
+
+  echo "%F{magenta}${icon} ${branch}%f ${git_state}"
 }
 
-# Muestra el código de salida del último comando si es distinto de 0
-exit_status_prompt() {
-    local es=$?
-    if [ $es -ne 0 ]; then
-        echo "%F{red}[!$es]%f "
-    fi
-}
+PROMPT='%F{cyan}%n@%m%f %F{yellow}%~%f $(exit_status) $(git_prompt)
+%B%F{blue}${PROMPT_EMOJI}%f%b '
 
-# Prompt principal (izquierda) y prompt derecho con hora
-# - Usuario@host en cyan
-# - Ruta en amarillo
-# - Código de salida (si != 0) y estado de git
-export PROMPT='%F{cyan}%n@%m%f %F{yellow}%~%f $(exit_status_prompt) $(git_prompt)%f %B%F{blue}%#%f%b '
-export RPROMPT='%F{green}%*%f'
+RPROMPT='%F{green}%*%f'
+
