@@ -105,10 +105,7 @@ alias gc="git commit -m '$1'"
 alias gp="git push"
 alias gf="git fetch && git pull"
 alias ga="git add '$1'"
-alias cd..="cd .."
 alias ls="ls -la"
-alias neofetch="fastfetch"
-alias vim="nvim"
 
 # funciones
 mkcd() {
