@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# gitinit
+# Descripcion: Script que inicializa un repo git y añade un remote origin
+# Autor: Javier Rodríguez-Alarcón <javier@javierdz.dev>
+
+# NOTA: Este script asume que el directoria actual es el directorio del proyecto
+if [ ! -d ".git" ]; then
+    git init
+    echo "Repositorio Git inicializado."
+else
+    echo "El directorio ya es un repositorio Git."
+fi
+if [ "$1" -eq ""]; then
+    echo "No se proporcionó URL del remote origin."
+    exit 1
+else
+    git remote add origin "$1"
+    echo "Remote origin añadido: $1"
+fi
+git branch -M main
+echo "Repositorio configurado con la rama principal 'main'."
+echo "Primer commit generado con gitinit." > README.md
+git add README.md
+git commit -m "Primer commit"
+git push --set-upstream origin main
+if [ $? -eq 0 ]; then
+    echo "Cambios empujados al remote origin exitosamente."
+else
+    echo "Error al empujar los cambios al remote origin."
+fi
+exit 0
+

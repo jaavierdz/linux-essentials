@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+
+# Diskutil - Utilidad de discos para las tareas propuestas en clase de gestion de discos.
+# Autor: Javier Rodríguez-Alarcón <javier@javierdz.dev>
+
+# Función para mostrar el menú principal
+if [ "$EUID" -ne 0 ]; then
+    echo "Por favor, ejecuta este script como root."
+    exit 1
+fi
+
+show_menu() {
+    clear
+    echo "======================================"
+    echo "        Utilidad de Discos"
+    echo "======================================"
+    echo "1. Listar discos y volúmenes"
+    echo "2. Crear una partición"
+    echo "3. Formatear un volumen"
+    echo "4. Montar un volumen"
+    echo "5. Desmontar un volumen"
+    echo "6. Gestión LVM"
+    echo "0. Salir"
+    read -p "Selecciona una opción: " opcion
+    return $opcion
+}
+# Función para listar discos y volúmenes
+list_devices() {
+    echo "Listando discos y volúmenes..."
+    lsblk
+    read -p "Presiona Enter para continuar..."
+    show_menu
+}
+# Función para crear una partición
+create_partition() {
+    read -p "Ingresa el nombre del disco (ej. /dev/sda):" disk
+    read -p "Ingresa el tamaño de la partición (ej. +1G): " size
+    echo "Creando partición..."
+    parted $disk mkpart primary ext4 0% $size
+    if [ $? -ne 0 ]; then
+        echo "Error al crear la partición."
+        read -p "Presiona Enter para continuar..."
+        show_menu
+        return
+    fi
+    echo "Partición creada."
+    read -p "Presiona Enter para continuar..."
+    show_menu
+}
+# Función para formatear un volumen
+format_volume() {
+    read -p "Ingresa el nombre del volumen (ej. /dev/sda1): " volume
+    read -p "Ingresa el sistema de archivos (ej. ext4, ntfs): " fs
+    echo "Formateando volumen..."
+    mkfs -t $fs $volume
+    if [ $? -ne 0 ]; then
+        echo "Error al formatear el volumen."
+        read -p "Presiona Enter para continuar..."
+        show_menu
+        return
+    fi
+    echo "Volumen formateado."
+    read -p "Presiona Enter para continuar..."
+    show_menu
+}
+# Función para montar un volumen
+mount_volume() {
+    read -p "Ingresa el nombre del volumen (ej. /dev/sda1): " volume
+    read -p "Ingresa el punto de montaje (ej. /mnt/mydisk): " mount_point
+    echo "Montando volumen..."
+    if [ ! -d $mount_point ]; then
+        mkdir -p $mount_point
+    fi
+    if [ $(mount | grep $volume) ]; then
+        echo "El volumen ya está montado."
+        read -p "Presiona Enter para continuar..."
+        show_menu
+        return
+    fi
+    mount $volume $mount_point
+    echo "Volumen montado."
+    read -p "Presiona Enter para continuar..."
+    show_menu
+}
+# Función para desmontar un volumen
+unmount_volume() {
+    read -p "Ingresa el nombre del volumen (ej. /dev/sda1): " volume
+    echo "Desmontando volumen..."
+    umount $volume
+    if [ $? -ne 0 ]; then
+        echo "Error al desmontar el volumen."
+        read -p "Presiona Enter para continuar..."
+        show_menu
+        return
+    fi
+    echo "Volumen desmontado."
+    read -p "Presiona Enter para continuar..."
+    show_menu
+}
+# Función para gestión LVM
+manage_lvm() {
+    clear
+    echo "======================================"
+    echo "           Gestión LVM"
+    echo "======================================"
+    echo "1. Crear un volumen físico"
+    echo "2. Crear un grupo de volúmenes"
+    echo "3. Crear un volumen lógico"
+    echo "4. Extender un volumen lógico"
+    echo "5. Reducir un volumen lógico"
+    echo "0. Volver al menú principal"
+    read -p "Selecciona una opción: " lvm_option
+    case $lvm_option in
+        1)
+            read -p "Ingresa el nombre del disco (ej. /dev/sdb1): " pv_disk
+            pvcreate $pv_disk
+            ;;
+        2)
+            read -p "Ingresa el nombre del grupo de volúmenes: " vg_name
+            read -p "Ingresa los discos a incluir (ej. /dev/sdb1 /dev/sdc1): " pv_disks
+            vgcreate $vg_name $pv_disks
+            ;;
+        3)
+            read -p "Ingresa el nombre del volumen lógico: " lv_name
+            read -p "Ingresa el nombre del grupo de volúmenes: " vg_name
+            read -p "Ingresa el tamaño del volumen lógico (ej. +1G): " lv_size
+            lvcreate -L $lv_size -n $lv_name $vg_name
+            ;;
+        4)
+            read -p "Ingresa el nombre del volumen lógico (ej. /dev/vg_name/lv_name): " lv_path
+            read -p "Ingresa el tamaño a extender (ej. +1G): " extend_size
+            lvextend -L $extend_size $lv_path
+            resize2fs $lv_path
+            ;;
+        5)
+            read -p "Ingresa el nombre del volumen lógico (ej. /dev/vg_name/lv_name): " lv_path
+            read -p "Ingresa el nuevo tamaño del volumen lógico (ej. 1G): " new_size
+            lvreduce -L $new_size $lv_path
+            resize2fs $lv_path
+            ;;
+        0)
+            show_menu
+            return
+            ;;
+        *)
+            echo "Opción inválida."
+            ;;
+    esac
+    read -p "Presiona Enter para continuar..."
+    manage_lvm
+}
+# Bucle principal
+while true; do
+    show_menu
+    opcion=$?
+    case $opcion in
+        1)
+            list_devices
+            ;;
+        2)
+            create_partition
+            ;;
+        3)
+            format_volume
+            ;;
+        4)
+            mount_volume
+            ;;
+        5)
+            unmount_volume
+            ;;
+        6)
+            manage_lvm
+            ;;
+        0)
+            echo "Saliendo..."
+            exit 0
+            ;;
+        *)
+            echo "Opción inválida."
+            ;;
+    esac
+done    
