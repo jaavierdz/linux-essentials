@@ -163,11 +163,11 @@ release() {
 }
 # funcion para actualizar este .zshrc desde el repositorio
 update_zshrc() {
-    if [ ! -d "~/linux-essentials" ]; then
-        echo "El directorio ~/linux-essentials no existe. Clonando el repositorio..."
-        git clone https://github.com/jaavierdz/linux-essentials.git ~/linux-essentials
+    if [ ! -d "~/Trabajo/linux-essentials" ]; then
+        echo "El directorio ~/Trabajo/linux-essentials no existe. Clonando el repositorio..."
+        git clone https://github.com/jaavierdz/linux-essentials.git ~/Trabajo/linux-essentials
     fi
-    cd ~/linux-essentials || return
+    cd ~/Trabajo/linux-essentials || return
     git pull origin main
     cp ~/.zshrc ~/.zshrc.bak
     cp .zshrc ~/.zshrc
