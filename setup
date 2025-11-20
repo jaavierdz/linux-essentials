@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+# Setup Script para el entorno
+# Autor: Javier Rodríguez-Alarcón <javier@javierdz.dev>
+
+# Instalar todo
+if [ "$EUID" -ne 0 ]; then
+    echo "Por favor, ejecuta este script como root."
+    exit 1
+fi
+if [ ! -f "~/.zshrc"]; then
+    echo "No tienes instalado ZSH. Instalando..."
+    apt install zsh -y
+fi
+if [ ! -d "~/.oh-my-zsh" ]; then
+    echo "No tienes instalado Oh My Zsh. Instalando..."
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+echo "Configurando .zshrc..."
+cp $PWD/.zshrc ~/.zshrc
+echo "Instalando gitinit..."
+cp $PWD/gitinit /usr/local/bin/gitinit
+chmod +x /usr/local/bin/gitinit
+chown $USER:$USER /usr/local/bin/gitinit
+echo "Instalando diskutil..."
+cp $PWD/diskutil /usr/local/bin/diskutil
+chmod +x /usr/local/bin/diskutil
+chown $USER:$USER /usr/local/bin/diskutil
+echo "Setup completado. Reinicia tu terminal o ejecuta 'source ~/.zshrc' para aplicar los cambios."
+exit 0
