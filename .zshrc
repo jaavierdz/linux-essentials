@@ -114,12 +114,12 @@ publicip() {
 }
 # funcion para mostrar la ip privada
 privateip() {
-    ipconfig getifaddr en0
+    ifconfig getifaddr en0
 }
 # funcion para mostrar ambas ips
 myips() {
     echo "IP Privada: $(privateip)"
-    echo "IP Pública: $(publicip)"
+    echo "IP publica: $(publicip)"
 }
 # funcion para reiniciar servicios
 restartservice() {
@@ -133,4 +133,17 @@ restartservice() {
 # funcion para ver el estado de un servicio
 statusservice() {
     sudo systemctl status "$1"
+}
+
+release() {
+    lsb_release -a
+}
+# funcion para actualizar este .zshrc desde el repositorio
+update_zshrc() {
+    cd ~/linux-essentials || return
+    git pull origin main
+    cp ~/.zshrc ~/.zshrc.bak
+    cp .zshrc ~/.zshrc
+    source ~/.zshrc
+    echo ".zshrc actualizado desde el repositorio."
 }
