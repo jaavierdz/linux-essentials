@@ -31,7 +31,6 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias reload="source ~/.zshrc"
-alias update_omz="omz update"
 
 # funciones
 mkcd() {
