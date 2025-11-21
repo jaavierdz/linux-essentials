@@ -144,7 +144,51 @@ publicip() {
 }
 # funcion para mostrar la ip privada
 privateip() {
-    ifconfig getifaddr en0
+    # detectar adaptador de red y obtener IP de forma robusta para macOS y Linux
+
+    if [[ "$(uname)" == "Darwin" ]]; then
+        # intentar obtener la interfaz por la ruta por defecto
+        ADAPTER=$(route get default 2>/dev/null | awk '/interface:/{print $2; exit}')
+        # fallback a interfaces comunes si no se detectó
+        if [[ -z "$ADAPTER" ]]; then
+            for a in en0 en1 en2; do
+                if ipconfig getifaddr "$a" >/dev/null 2>&1; then
+                    ADAPTER="$a"
+                    break
+                fi
+            done
+        fi
+
+        if [[ -n "$ADAPTER" ]]; then
+            ipconfig getifaddr "$ADAPTER"
+        else
+            echo "No se pudo detectar el adaptador en macOS"
+            return 1
+        fi
+    else
+        # Linux: obtener la interfaz por la ruta por defecto
+        ADAPTER=$(ip route 2>/dev/null | awk '/default/ {print $5; exit}')
+        if [[ -z "$ADAPTER" ]]; then
+            ADAPTER=$(ip route get 8.8.8.8 2>/dev/null | awk '/dev/ {for(i=1;i<=NF;i++) if($i=="dev") print $(i+1); exit}')
+        fi
+
+        if [[ -n "$ADAPTER" ]]; then
+            # obtener la IP IPv4 asociada a la interfaz
+            ip -4 -o addr show dev "$ADAPTER" 2>/dev/null | awk '{split($4,a,"/"); print a[1]; exit}'
+        else
+            # fallback: intentar hostname -I o ifconfig
+            if command -v hostname >/dev/null 2>&1; then
+                ipaddr=$(hostname -I 2>/dev/null | awk '{print $1}')
+                if [[ -n "$ipaddr" ]]; then
+                    echo "$ipaddr"
+                    return 0
+                fi
+            fi
+            # último recurso
+            ip -4 -o addr show 2>/dev/null | awk '!/ lo / {split($4,a,"/"); print a[1]; exit}' || \
+            ifconfig 2>/dev/null | awk '/inet / && $2!="127.0.0.1" {print $2; exit}'
+        fi
+    fi
 }
 # funcion para mostrar ambas ips
 myips() {
