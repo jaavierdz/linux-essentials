@@ -4,13 +4,26 @@
 # Autor: Javier Rodríguez-Alarcón <javier@javierdz.dev>
 
 # Instalar todo
-if [ "$EUID" -ne 0 ]; then
-    echo "Por favor, ejecuta este script como root."
-    exit 1
+# Si no esta zsh instalado, instalarlo
+if [ ! -x "$(command -v zsh)" ]; then
+    echo "ZSH no está instalado. Instalando..."
+    # detectar gestor de paquetes y usar el adecuado
+    if [ -x "$(command -v apt)" ]; then
+        PKG_MANAGER="apt"
+    elif [ -x "$(command -v yum)" ]; then
+        PKG_MANAGER="yum"
+    elif [ -x "$(command -v pacman)" ]; then
+        PKG_MANAGER="pacman"
+    else
+        echo "No se encontró un gestor de paquetes compatible. Instala ZSH manualmente."
+        exit 1
+    fi
+    $PKG_MANAGER update
+    $PKG_MANAGER install zsh -y
 fi
 if [ ! -f "~/.zshrc"]; then
     echo "No tienes instalado ZSH. Instalando..."
-    apt install zsh -y
+    $PKG_MANAGER install zsh -y
 fi
 if [ ! -d "~/.oh-my-zsh" ]; then
     echo "No tienes instalado Oh My Zsh. Instalando..."
