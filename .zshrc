@@ -1,6 +1,3 @@
-#
-#
-#
 # ~/.zshrc
 # Descripcion: Archivo de configuracion de ZSH personalizado de Javier
 # Autor: Javier Rodríguez-Alarcón <javier@javierdz.dev>
@@ -31,6 +28,16 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias reload="source ~/.zshrc"
+alias cls="clear"
+alias update="sudo apt update && sudo apt upgrade -y"
+alias ports="sudo lsof -i -P -n | grep LISTEN"
+alias h="history"
+alias j="jobs -l"
+alias c="clear"
+alias vi="vim"
+alias svi="sudo vim"
+alias path="echo -e ${PATH//:/\\n}"
+
 
 # funciones
 mkcd() {
@@ -166,13 +173,18 @@ update_zshrc() {
     if [ ! -d "~/Trabajo/linux-essentials" ]; then
         echo "El directorio ~/Trabajo/linux-essentials no existe. Clonando el repositorio..."
         git clone https://github.com/jaavierdz/linux-essentials.git ~/Trabajo/linux-essentials
-    fi
+    fi 
     cd ~/Trabajo/linux-essentials || return
     git pull origin main
     cp ~/.zshrc ~/.zshrc.bak
     cp .zshrc ~/.zshrc
     source ~/.zshrc
     echo ".zshrc actualizado desde el repositorio."
+}
+
+
+emely() {
+    echo "EEEEEEEMELYYYYYYYYYYYYYYYYYY"
 }
 
 # PROMPT PERSONALIZAZDO
@@ -204,4 +216,3 @@ PROMPT='%F{cyan}%n@%m%f %F{yellow}%~%f $(exit_status) $(git_prompt)
 %B%F{blue}${PROMPT_EMOJI}%f%b '
 
 RPROMPT='%F{green}%*%f'
-
