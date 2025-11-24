@@ -256,7 +256,7 @@ git_prompt() {
   echo "%F{magenta}${icon} ${branch}%f ${git_state}"
 }
 
-PROMPT='%F{cyan}%n@%m%f %F{yellow}%~%f $(exit_status) $(git_prompt)
+PROMPT='%F{cyan}%n@%m%f %F{cyan}on%f %F{yellow}%~%f $(exit_status) $(git_prompt)
 %B%F{blue}${PROMPT_EMOJI}%f%b '
 
 RPROMPT='%F{green}%*%f'
