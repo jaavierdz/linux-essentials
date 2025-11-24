@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+
+if [ ! -f ~/.zshrc ]; then
+    echo "Donde coño esta el zshrc, tu eres tonto?"
+    exit 1
+else
+    cp ./.zshrc ~/.zshrc
+    source ~/.zshrc
+    echo "se ha actualizado el .zshrc"
+fi
