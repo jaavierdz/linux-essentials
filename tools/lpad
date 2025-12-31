@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# Poner como padding el input en la izquierda con un string (pipeado)
+#
+#  Autor: Javier Rodríguez-Alarcón <javier@javierdz.dev> | Inspirado fuertemente
+#  por Dave Eddy <dave@daveeddy.com>
+# Fecha: 31 de diciembre de 2025
+
+# Uso: echo ... | lpad 'string'
+lpad() {
+	local s=$1
+	local line=
+	while IFS= read -r line; do
+		echo "$s$line"
+	done
+
+}
+
+if ! (return &>/dev/null); then
+	lpad "$@"
+fi
