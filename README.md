@@ -61,4 +61,4 @@ Por defecto no se incluye una licencia. Si deseas que el proyecto sea reutilizab
 
 ---
 
-Si quieres, puedo: añadir una licencia (`MIT`), crear ejemplos reales de uso para cada script, o traducir el README al inglés.
+
